@@ -1,0 +1,572 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="حضور المواد"><meta name="theme-color" content="#0f6b78">
+<title>نظام حضور المرحلة الثانية — جميع المواد</title>
+<style>
+:root{font-family:Tahoma,Arial,sans-serif;color:#172033;background:#f3f6fb;color-scheme:light}*{box-sizing:border-box}
+body{margin:0;padding:16px}.wrap{max-width:1100px;margin:auto}
+.hero{background:#0f6b78;color:#fff;padding:18px 22px;border-radius:16px}.hero h1{margin:0 0 6px;font-size:23px}.hero p{margin:0;color:#dff3f5;line-height:1.8}
+.panel{background:#fff;border:1px solid #dce4ef;border-radius:14px;padding:16px;margin-top:14px;box-shadow:0 4px 14px #162b4a0b}
+h2{font-size:18px;margin:0 0 12px}h3{font-size:16px;margin:0 0 8px}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:14px}.box{border:1px solid #e2e8f0;border-radius:12px;padding:12px;background:#fafcff}
+label{display:block;font-weight:700;margin:10px 0 6px}
+input[type=file],select,input[type=text]{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:9px;background:#fff;font:inherit}
+button{border:0;border-radius:10px;padding:11px 15px;font:inherit;font-weight:700;cursor:pointer;background:#1769aa;color:#fff}button:disabled{opacity:.45;cursor:not-allowed}
+.secondary{background:#e7eef7;color:#163451}.danger{background:#b93838}.ok{background:#1e8a4c}
+.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.status{padding:10px 12px;border-radius:9px;background:#eef4fb;margin-top:8px;line-height:1.7;white-space:pre-line;font-size:14px}
+.good{background:#e6f7ec;color:#17643a}.warn{background:#fff4d9;color:#785200}.bad{background:#ffebeb;color:#8c2020}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(310px,1fr));gap:14px}
+.card{border:2px solid #cfe0ea;border-radius:16px;padding:14px;background:#fff}.card.done{border-color:#1e8a4c;background:#f4fbf6}
+.card h3{background:#e8f4f6;margin:-14px -14px 10px;padding:12px 14px;border-radius:14px 14px 0 0;color:#0f4c58}
+.files{margin:8px 0;font-size:13px;color:#445}.files div{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px dashed #e2e8f0}
+.files button{padding:2px 9px;font-size:12px;background:#e7eef7;color:#a02525}
+.muted{color:#5c6b7e;font-size:13px;line-height:1.7}
+table{border-collapse:collapse;width:100%}th,td{text-align:right;border-bottom:1px solid #e2e8f0;padding:6px;font-size:13px;vertical-align:top}th{background:#f3f6fa}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.chip{padding:5px 10px;border-radius:99px;border:1px solid #cbd5e1;background:#fff;cursor:pointer;font-size:13px;user-select:none}
+.chip input{margin-inline-end:5px}.chip.on{background:#fff2a8;border-color:#e0b800}
+.sugg button{padding:3px 9px;font-size:12px;margin:2px}
+.hol{margin-top:10px;padding:8px;border:1px dashed #e0b800;border-radius:10px;background:#fffdf0}
+details summary{cursor:pointer;font-weight:700;color:#0f4c58}
+@media(max-width:680px){body{padding:10px}}
+</style>
+</head>
+<body><main class="wrap">
+<div class="hero"><h1>نظام حضور المرحلة الثانية — جميع المواد</h1>
+<p>الملفات تنحفظ بالجهاز وتتحدث تلقائياً. اختر رقم المحاضرة، وبكل مادة ارفع ملف الحضور (ملف أو أكثر)، والنظام يكتب <b>1</b> للحاضر و<b>0</b> للغائب، و«<b>عطلة</b>» (أصفر) لمجموعة العطلة.</p></div>
+
+<section class="panel"><h2>١) الملفات المحفوظة</h2>
+<div class="grid2">
+ <div class="box"><h3>ملف حضور المرحلة (جميع المواد)</h3>
+  <div id="masterInfo" class="status">لا يوجد ملف محفوظ. اختر الملف مرة وحدة.</div>
+  <label for="masterFile">اختيار الملف (xlsx)</label><input id="masterFile" type="file" accept=".xlsx">
+  <div class="actions"><button id="dlBtn" class="ok" disabled>تنزيل الملف المحدّث</button></div></div>
+ <div class="box"><h3>ملف أسماء الطلاب ومجاميعهم</h3>
+  <div id="groupsInfo" class="status">لا يوجد ملف مجاميع محفوظ. (تحتاجه فقط لخيار العطلة)</div>
+  <label for="groupsFile">اختيار الملف (xlsx)</label><input id="groupsFile" type="file" accept=".xlsx">
+  <div class="actions"><button id="groupsClear" class="secondary" disabled>حذف المجاميع المحفوظة</button></div></div>
+</div></section>
+
+<section class="panel"><h2>٢) رقم المحاضرة</h2>
+<div style="max-width:260px"><select id="lecture"></select></div><div id="lectureNote" class="muted" style="margin-top:6px"></div></section>
+
+<section class="panel"><h2>٣) المواد</h2><div id="cards" class="cards"><div class="muted">حمّل ملف الحضور أولاً.</div></div></section>
+
+<section class="panel"><h2>سجل العمليات</h2><div id="log" class="muted">—</div></section>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script>
+(()=>{
+'use strict';
+const $=id=>document.getElementById(id);
+const NS_MAIN='http://schemas.openxmlformats.org/spreadsheetml/2006/main';
+const XML_HEAD='<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+function logLine(t){const d=document.createElement('div');d.textContent=new Date().toLocaleTimeString('ar-IQ')+' — '+t;const L=$('log');if(L.textContent==='—')L.textContent='';L.prepend(d);}
+function setStatus(id,msg,cls){const e=$(id);e.className='status '+(cls||'');e.textContent=msg;}
+
+/* ---------------- التخزين بالمتصفح (IndexedDB) ---------------- */
+function idb(){return new Promise((res,rej)=>{const r=indexedDB.open('stage_attendance_db',1);r.onupgradeneeded=()=>r.result.createObjectStore('kv');r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});}
+async function idbGet(k){const db=await idb();return new Promise((res,rej)=>{const q=db.transaction('kv').objectStore('kv').get(k);q.onsuccess=()=>{db.close();res(q.result);};q.onerror=()=>{db.close();rej(q.error);};});}
+async function idbSet(k,v){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=()=>{db.close();res();};t.onerror=()=>{db.close();rej(t.error);};});}
+async function idbDel(k){const db=await idb();return new Promise((res,rej)=>{const t=db.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=()=>{db.close();res();};t.onerror=()=>{db.close();rej(t.error);};});}
+
+/* ---------------- أدوات الأسماء ---------------- */
+function normName(s){
+ s=String(s==null?'':s).normalize('NFKC');
+ s=s.replace(/[\u064B-\u065F\u0670\u0640]/g,'');
+ s=s.replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').replace(/ة/g,'ه').replace(/ؤ/g,'و').replace(/ئ/g,'ي').replace(/گ/g,'ك').replace(/چ/g,'ج').replace(/پ/g,'ب').replace(/ڤ/g,'ف');
+ s=s.replace(/[^\u0621-\u064A0-9a-zA-Z\s]/g,' ');
+ return s.replace(/\s+/g,' ').trim().toLowerCase();
+}
+const STOP=new Set(['اسم','الطالب','الطلاب','الحضور','حاضر','غائب','محاضره','المحاضره','المجموع','الرقم','الامتحاني','المرحله','الثانيه','مجاز','عطله','سجل','ماده','المواد','ملاحظات','التاريخ','الوقت','المده','الاجمالي','المجموعه','الايميل','اسماء','عدد','الغيابات','الاجازات','القسم','الكليه','الجامعه'].map(normName));
+function looksLikeName(n){
+ if(!/[\u0621-\u064A]/.test(n))return false;
+ const tk=n.split(' ').filter(Boolean);
+ if(tk.length<2||tk.length>9||n.length>70)return false;
+ return !tk.some(t=>STOP.has(t));
+}
+function put(m,k,i){m.has(k)?m.set(k,-1):m.set(k,i);}
+function buildIndex(students){
+ const idx={exam:new Map(),exact:new Map(),sorted:new Map()};
+ students.forEach((s,i)=>{
+  s.norm=normName(s.name);s.tk=s.norm.split(' ').filter(Boolean);s.tkSet=new Set(s.tk);
+  idx.exam.set(s.exam,i);put(idx.exact,s.norm,i);put(idx.sorted,[...s.tk].sort().join(' '),i);
+ });
+ return idx;
+}
+/* يرجع {i,how} أو {amb:true} أو null */
+function matchText(students,idx,raw){
+ const t=String(raw==null?'':raw).trim();
+ if(!t)return null;
+ if(/^\d{8,12}$/.test(t)){return idx.exam.has(t)?{i:idx.exam.get(t),how:'exam'}:null;}
+ const n=normName(t),tk=n.split(' ').filter(Boolean);
+ if(tk.length<2)return null;
+ let v=idx.exact.get(n);
+ if(v!==undefined)return v===-1?{amb:true}:{i:v,how:'exact'};
+ v=idx.sorted.get([...tk].sort().join(' '));
+ if(v!==undefined)return v===-1?{amb:true}:{i:v,how:'exact'};
+ if(tk.length>=3){
+  const cs=new Set(tk);let found=-2;
+  for(let i=0;i<students.length;i++){
+   const st=students[i];
+   const a=tk.every(x=>st.tkSet.has(x)),b=st.tk.length>=3&&st.tk.every(x=>cs.has(x));
+   if(a||b){if(found===-2)found=i;else{found=-1;break;}}
+  }
+  if(found>=0)return {i:found,how:'fuzzy'};
+  if(found===-1)return {amb:true};
+ }
+ return null;
+}
+function suggestions(students,raw){
+ const tk=new Set(normName(raw).split(' ').filter(Boolean));const out=[];
+ students.forEach((s,i)=>{let inter=0;tk.forEach(x=>{if(s.tkSet.has(x))inter++;});const u=tk.size+s.tkSet.size-inter;const sc=u?inter/u:0;if(sc>=0.4)out.push([sc,i]);});
+ out.sort((a,b)=>b[0]-a[0]);return out.slice(0,3).map(x=>x[1]);
+}
+
+/* ---------------- قراءة xlsx (بدون أي مكتبة غير JSZip) ---------------- */
+const parseXml=s=>{const d=new DOMParser().parseFromString(s,'application/xml');if(d.getElementsByTagName('parsererror').length)throw new Error('ملف XML غير صالح');return d;};
+function colIdx(L){let n=0;for(const ch of L)n=n*26+ch.charCodeAt(0)-64;return n;}
+function letters(ref){return ref.match(/^[A-Z]+/)[0];}
+function rowOf(ref){return +ref.match(/\d+$/)[0];}
+function sharedFrom(doc){return [...doc.getElementsByTagName('si')].map(si=>[...si.getElementsByTagName('t')].map(t=>t.textContent).join(''));}
+function cellText(c,shared){
+ const t=c.getAttribute('t'),v=c.getElementsByTagName('v')[0];
+ if(t==='inlineStr')return [...c.getElementsByTagName('t')].map(x=>x.textContent).join('');
+ if(!v)return '';
+ if(t==='s')return shared[+v.textContent]??'';
+ return v.textContent;
+}
+async function openXlsx(buf){
+ const zip=await JSZip.loadAsync(buf);
+ const f=n=>zip.file(n);
+ if(!f('xl/workbook.xml'))throw new Error('هذا الملف ليس Excel بصيغة xlsx.');
+ const shared=f('xl/sharedStrings.xml')?sharedFrom(parseXml(await f('xl/sharedStrings.xml').async('string'))):[];
+ const wb=parseXml(await f('xl/workbook.xml').async('string')),rel=parseXml(await f('xl/_rels/workbook.xml.rels').async('string'));
+ const rm={};for(const r of rel.getElementsByTagName('Relationship'))rm[r.getAttribute('Id')]=r.getAttribute('Target');
+ const sheets=[];
+ for(const s of wb.getElementsByTagName('sheet')){
+  const rid=s.getAttributeNS('http://schemas.openxmlformats.org/officeDocument/2006/relationships','id')||s.getAttribute('r:id');
+  let tg=rm[rid];tg=tg.startsWith('/')?tg.slice(1):'xl/'+tg;
+  sheets.push({name:s.getAttribute('name'),path:tg});
+ }
+ return {zip,shared,sheets};
+}
+/* كل خلايا الملف كنصوص مسطحة (لملفات الحضور) */
+async function xlsxFlatTexts(buf){
+ const x=await openXlsx(buf),out=[];
+ for(const sh of x.sheets){const d=parseXml(await x.zip.file(sh.path).async('string'));for(const c of d.getElementsByTagName('c')){const t=cellText(c,x.shared).trim();if(t)out.push(t);}}
+ return out;
+}
+/* صفوف مرتبة (للمجاميع) */
+async function xlsxRows(buf){
+ const x=await openXlsx(buf),res=[];
+ for(const sh of x.sheets){
+  const d=parseXml(await x.zip.file(sh.path).async('string')),rows=[];
+  for(const r of d.getElementsByTagName('row')){const arr=[];for(const c of r.getElementsByTagName('c')){arr[colIdx(letters(c.getAttribute('r')))-1]=cellText(c,x.shared).trim();}rows[+r.getAttribute('r')]=arr;}
+  res.push({name:sh.name,rows});
+ }
+ return res;
+}
+async function fileTexts(file){
+ const name=file.name.toLowerCase(),buf=await file.arrayBuffer();
+ if(name.endsWith('.xlsx')||name.endsWith('.xlsm'))return xlsxFlatTexts(buf);
+ if(name.endsWith('.xls'))throw new Error('الملف '+file.name+' بصيغة xls القديمة. افتحه بـ Excel واحفظه كـ xlsx.');
+ let txt=new TextDecoder('utf-8').decode(buf);
+ if(txt.includes('\uFFFD')){try{txt=new TextDecoder('windows-1256').decode(buf);}catch(e){}}
+ return txt.split(/[\r\n\t,;]+/).map(s=>s.replace(/^"|"$/g,'').trim()).filter(Boolean);
+}
+
+/* ---------------- نموذج ملف المرحلة ---------------- */
+let master=null; // {zip,shared,sheets:[...subjects],other:[...],wbXml,holidayStyle,name}
+function parseSubjectSheet(name,path,doc,shared){
+ const sd=doc.getElementsByTagName('sheetData')[0],rows=new Map();
+ for(const r of sd.children)rows.set(+r.getAttribute('r'),r);
+ const txt=c=>cellText(c,shared);
+ let hdr=0;
+ for(let r=1;r<=15&&!hdr;r++){const row=rows.get(r);if(!row)continue;for(const c of row.children){if(letters(c.getAttribute('r'))==='A'&&txt(c).trim()==='الرقم الامتحاني'){hdr=r;break;}}}
+ if(!hdr)return null;
+ const lec={},tot={};
+ for(const c of rows.get(hdr).children){
+  const t=txt(c).trim(),L=letters(c.getAttribute('r')),m=t.match(/^محاضرة\s*(\d+)$/);
+  if(m)lec[+m[1]]=L;else if(t==='مجموع الحضور')tot.p=L;else if(t==='عدد الغيابات')tot.a=L;else if(t==='عدد الإجازات')tot.e=L;
+ }
+ if(!Object.keys(lec).length)return null;
+ const students=[];
+ for(const [r,row] of rows){
+  if(r<=hdr)continue;let a='',b='';
+  for(const c of row.children){const L=letters(c.getAttribute('r'));if(L==='A')a=txt(c).trim();else if(L==='B')b=txt(c).trim();}
+  if(a&&b)students.push({row:r,exam:a,name:b});
+ }
+ return {name,path,doc,rows,hdr,lec,tot,students,idx:buildIndex(students),shared};
+}
+function getCell(sh,r,L,create){
+ const row=sh.rows.get(r);if(!row)return null;
+ const ref=L+r;
+ for(const c of row.children)if(c.getAttribute('r')===ref)return c;
+ if(!create)return null;
+ const c=sh.doc.createElementNS(NS_MAIN,'c');c.setAttribute('r',ref);
+ const ci=colIdx(L);let before=null;
+ for(const x of row.children){if(colIdx(letters(x.getAttribute('r')))>ci){before=x;break;}}
+ row.insertBefore(c,before);return c;
+}
+function valueOf(sh,r,L){const c=getCell(sh,r,L,false);return c?cellText(c,sh.shared).trim():'';}
+function baseStyle(sh,r){const a=getCell(sh,r,'A',false);return a&&a.getAttribute('s')?a.getAttribute('s'):'2';}
+function setCell(sh,r,L,kind,style,ssIdx){
+ const c=getCell(sh,r,L,true);
+ while(c.firstChild)c.removeChild(c.firstChild);
+ if(style!=null)c.setAttribute('s',style);
+ const v=sh.doc.createElementNS(NS_MAIN,'v');
+ if(kind==='s'){c.setAttribute('t','s');v.textContent=String(ssIdx);}
+ else{c.removeAttribute('t');v.textContent=kind==='1'?'1':'0';}
+ c.appendChild(v);
+}
+function clearCellKeepStyle(sh,r,L,style){const c=getCell(sh,r,L,true);while(c.firstChild)c.removeChild(c.firstChild);c.removeAttribute('t');if(style!=null)c.setAttribute('s',style);}
+
+async function loadMasterBuffer(buf,name){
+ const x=await openXlsx(buf);
+ const subs=[],other=[];
+ for(const sh of x.sheets){
+  const doc=parseXml(await x.zip.file(sh.path).async('string'));
+  const m=parseSubjectSheet(sh.name,sh.path,doc,x.shared);
+  if(m)subs.push(m);else other.push({name:sh.name,path:sh.path,doc});
+ }
+ if(!subs.length)throw new Error('ما لقيت أوراق المواد (لازم فيها «الرقم الامتحاني» و«محاضرة 1 ... محاضرة N»).');
+ const wbXml=await x.zip.file('xl/workbook.xml').async('string');
+ const m={zip:x.zip,shared:x.shared,subs,other,wbXml,name:name||'attendance.xlsx',undo:null,holidayStyle:null,ssXml:null};
+ // أسلوب الخلية «عطلة»: نستعمل الموجود بالملف، وإذا ماكو ننشئ أسلوب أصفر
+ const cnt={};
+ for(const s of subs)for(const st of s.students)for(const L of Object.values(s.lec)){const c=getCell(s,st.row,L,false);if(c&&cellText(c,x.shared).trim()==='عطلة'){const k=c.getAttribute('s')||'';cnt[k]=(cnt[k]||0)+1;}}
+ const best=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+ m.holidayStyle=best?best[0]:null;
+ return m;
+}
+async function ensureHolidayStyle(m){
+ if(m.holidayStyle)return m.holidayStyle;
+ const f=m.zip.file('xl/styles.xml');if(!f)return null;
+ const d=parseXml(await f.async('string')),fills=d.getElementsByTagName('fills')[0],xfs=d.getElementsByTagName('cellXfs')[0];
+ const fill=d.createElementNS(NS_MAIN,'fill'),pf=d.createElementNS(NS_MAIN,'patternFill');pf.setAttribute('patternType','solid');
+ const fg=d.createElementNS(NS_MAIN,'fgColor');fg.setAttribute('rgb','FFFFFF00');const bg=d.createElementNS(NS_MAIN,'bgColor');bg.setAttribute('indexed','64');
+ pf.appendChild(fg);pf.appendChild(bg);fill.appendChild(pf);fills.appendChild(fill);fills.setAttribute('count',String(fills.children.length));
+ const base=xfs.children[+(baseStyle(m.subs[0],m.subs[0].students[0].row))]||xfs.children[0];
+ const xf=base.cloneNode(true);xf.setAttribute('fillId',String(fills.children.length-1));xf.setAttribute('applyFill','1');
+ xfs.appendChild(xf);xfs.setAttribute('count',String(xfs.children.length));
+ m.zip.file('xl/styles.xml',XML_HEAD+new XMLSerializer().serializeToString(d).replace(/^<\?xml[^>]*\?>\s*/,''));
+ m.holidayStyle=String(xfs.children.length-1);return m.holidayStyle;
+}
+function ssIndex(m,text){
+ let i=m.shared.indexOf(text);
+ if(i>=0)return i;
+ m.shared.push(text);i=m.shared.length-1;m.ssAdded=(m.ssAdded||[]);m.ssAdded.push(text);return i;
+}
+async function serializeMaster(m){
+ const ser=new XMLSerializer();
+ const strip=s=>s.replace(/^<\?xml[^>]*\?>\s*/,'');
+ for(const s of m.subs)m.zip.file(s.path,XML_HEAD+strip(ser.serializeToString(s.doc)));
+ for(const o of m.other)m.zip.file(o.path,XML_HEAD+strip(ser.serializeToString(o.doc)));
+ if(m.ssAdded&&m.ssAdded.length){
+  const f=m.zip.file('xl/sharedStrings.xml');let xml=await f.async('string');
+  const add=m.ssAdded.map(t=>'<si><t xml:space="preserve">'+t.replace(/&/g,'&amp;').replace(/</g,'&lt;')+'</t></si>').join('');
+  xml=xml.replace('</sst>',add+'</sst>').replace(/uniqueCount="(\d+)"/,(a,n)=>'uniqueCount="'+(+n+m.ssAdded.length)+'"').replace(/ count="(\d+)"/,(a,n)=>' count="'+(+n+m.ssAdded.length)+'"');
+  m.zip.file('xl/sharedStrings.xml',xml);m.ssAdded=[];
+ }
+ let wbx=m.wbXml;
+ wbx=wbx.replace(/<calcPr([^>]*?)\/>/,(mm,a)=>a.includes('fullCalcOnLoad')?mm:'<calcPr'+a+' fullCalcOnLoad="1"/>');
+ m.zip.file('xl/workbook.xml',wbx);
+ return m.zip.generateAsync({type:'arraybuffer',compression:'DEFLATE'});
+}
+/* تحديث القيم المخزنة للمجاميع (حتى المعاينات اللي ما تعيد الحساب تعرض الأرقام الصحيحة) */
+function setCached(c,val){let v=c.getElementsByTagName('v')[0];if(!v){v=c.ownerDocument.createElementNS(NS_MAIN,'v');c.appendChild(v);}v.textContent=String(val);}
+function refreshCaches(m){
+ const comp=new Map();
+ for(const s of m.subs){
+  for(const st of s.students){
+   let p=0,a=0,e=0;
+   for(const L of Object.values(s.lec)){const t=valueOf(s,st.row,L);if(t==='1')p++;else if(t==='0')a++;else if(t==='م')e++;}
+   const put=(col,val)=>{if(!col)return;const c=getCell(s,st.row,col,false);if(c)setCached(c,val);comp.set(s.name+'|'+col+st.row,val);};
+   put(s.tot.p,p);put(s.tot.a,a);put(s.tot.e,e);
+  }
+ }
+ for(const o of m.other){
+  const sd=o.doc.getElementsByTagName('sheetData')[0];if(!sd)continue;
+  const local=new Map(),shared={};
+  for(const row of sd.children)for(const c of row.children){
+   const f=c.getElementsByTagName('f')[0];if(!f)continue;
+   const ref=c.getAttribute('r'),r=rowOf(ref),L=letters(ref);let ft=f.textContent;
+   if(f.getAttribute('t')==='shared'){const si=f.getAttribute('si');if(ft){shared[si]=ft;}else ft=shared[si]||'';}
+   if(!ft)continue;
+   let val=null;
+   const refs=[...ft.matchAll(/'([^']+)'!([A-Z]+)(\d+)/g)];
+   if(refs.length&&/^(SUM\()?'/.test(ft)){val=refs.reduce((t,x)=>t+(comp.get(x[1]+'|'+x[2]+x[3])||0),0);}
+   else{const mm=ft.match(/^SUM\(([A-Z]+)\d+:([A-Z]+)\d+\)$/);if(mm){let t=0;for(let k=colIdx(mm[1]);k<=colIdx(mm[2]);k++){const key=String.fromCharCode(64+k)+r;t+=local.get(key)||0;}val=t;}}
+   if(val!==null){setCached(c,val);local.set(ref,val);}
+  }
+ }
+}
+async function saveMaster(){
+ const buf=await serializeMaster(master);
+ await idbSet('master',{name:master.name,buf,savedAt:Date.now()});
+ return buf;
+}
+
+/* ---------------- المجاميع ---------------- */
+let groups=null; // {name,savedAt,sets:{setName:{exam:group}}}
+async function parseGroups(buf,examMapFn){
+ const sheets=await xlsxRows(buf);
+ const sets={};
+ const addSet=(set,exam,g)=>{(sets[set]=sets[set]||{})[exam]=g;};
+ const GH=/(مجموع|كروب|گروب|group)/i;
+ for(const sh of sheets){
+  let hrow=0,gcols=[];
+  for(let r=1;r<=Math.min(sh.rows.length-1,15)&&!hrow;r++){const arr=sh.rows[r]||[];const cols=[];arr.forEach((t,ci)=>{if(t&&GH.test(normName(t))&&normName(t).split(' ').length<=3)cols.push(ci);});if(cols.length){hrow=r;gcols=cols;}}
+  if(hrow){
+   for(let r=hrow+1;r<sh.rows.length;r++){
+    const arr=sh.rows[r];if(!arr)continue;
+    const others=arr.filter((t,ci)=>t&&!gcols.includes(ci));
+    const hit=examMapFn(others);if(hit==null)continue;
+    for(const gc of gcols){const g=(arr[gc]||'').trim();if(g){addSet(sh.rows[hrow][gc].trim()||'المجموعات',hit,g.toUpperCase());}}
+   }
+   continue;
+  }
+  if(/^[A-Za-z]\d?$/.test(sh.name.trim())){
+   for(let r=1;r<sh.rows.length;r++){const arr=sh.rows[r];if(!arr)continue;const hit=examMapFn(arr.filter(Boolean));if(hit!=null)addSet('المجموعات',hit,sh.name.trim().toUpperCase());}
+  }
+ }
+ return sets;
+}
+function groupsMatcher(){
+ const s0=master.subs[0];
+ return arr=>{for(const t of arr){const m=matchText(s0.students,s0.idx,t);if(m&&m.i!==undefined)return s0.students[m.i].exam;}return null;};
+}
+function groupNamesOf(set){return [...new Set(Object.values(set))].sort((a,b)=>a.localeCompare(b,'en',{numeric:true}));}
+function renderGroupsInfo(){
+ if(!groups){setStatus('groupsInfo','لا يوجد ملف مجاميع محفوظ. (تحتاجه فقط لخيار العطلة)');$('groupsClear').disabled=true;return;}
+ const lines=Object.entries(groups.sets).map(([n,s])=>`• ${n}: ${groupNamesOf(s).map(g=>g+' ('+Object.values(s).filter(x=>x===g).length+')').join('، ')}`);
+ setStatus('groupsInfo','محفوظ ✓ — '+groups.name+'\n'+lines.join('\n'),'good');$('groupsClear').disabled=false;
+}
+
+/* ---------------- واجهة المواد ---------------- */
+const cardState=new Map(); // sheetName -> {files:[File], analysis, accepted:Set, holiday:{set,groups:Set}}
+function currentLecture(){return +$('lecture').value;}
+function lectureFilled(s,lec){const L=s.lec[lec];if(!L)return 0;let n=0;for(const st of s.students)if(valueOf(s,st.row,L)!=='')n++;return n;}
+function renderLectureOptions(){
+ const nums=[...new Set(master.subs.flatMap(s=>Object.keys(s.lec).map(Number)))].sort((a,b)=>a-b);
+ const sel=$('lecture');const keep=sel.value;sel.innerHTML='';
+ let next=nums[0];for(const n of nums){if(master.subs.every(s=>!s.lec[n]||lectureFilled(s,n)>0))next=nums.find(x=>x>n)||n;}
+ for(const n of nums){const o=document.createElement('option');o.value=n;o.textContent='المحاضرة '+n;sel.appendChild(o);}
+ sel.value=keep||next;updateLectureNote();
+}
+function updateLectureNote(){
+ if(!master)return;const lec=currentLecture();
+ $('lectureNote').textContent=master.subs.map(s=>s.name+': '+(lectureFilled(s,lec)?'مسجّلة سابقاً ('+lectureFilled(s,lec)+' خلية)':'فارغة')).join(' | ');
+}
+function renderCards(){
+ const box=$('cards');box.innerHTML='';
+ for(const s of master.subs){
+  if(!cardState.has(s.name))cardState.set(s.name,{files:[],analysis:null,accepted:new Set(),hol:{set:null,groups:new Set()}});
+  const st=cardState.get(s.name);
+  const card=document.createElement('div');card.className='card';card.id='card-'+s.name;
+  card.innerHTML=`<h3>${s.name}</h3><div class="muted">${s.students.length} طالب</div>
+   <input type="file" multiple accept=".xlsx,.csv,.txt,.xls" class="hid" style="display:none">
+   <div class="actions"><button class="pick secondary">+ اختيار ملفات حضور المادة</button><button class="reset secondary" style="display:none">إفراغ</button></div>
+   <div class="files"></div>
+   <div class="hol"></div>
+   <div class="actions"><button class="run">معالجة وعرض النتيجة</button></div>
+   <div class="result"></div>`;
+  box.appendChild(card);
+  const inp=card.querySelector('.hid');
+  card.querySelector('.pick').onclick=()=>inp.click();
+  inp.onchange=()=>{for(const f of inp.files)st.files.push(f);inp.value='';st.analysis=null;renderCard(s);};
+  card.querySelector('.reset').onclick=()=>{st.files=[];st.analysis=null;renderCard(s);};
+  card.querySelector('.run').onclick=()=>runAnalysis(s);
+  renderCard(s);
+ }
+}
+function renderCard(s){
+ const st=cardState.get(s.name),card=$('card-'+s.name);if(!card)return;
+ const fl=card.querySelector('.files');fl.innerHTML='';
+ st.files.forEach((f,i)=>{const d=document.createElement('div');d.innerHTML='<span></span><button>حذف</button>';d.firstChild.textContent=f.name;d.lastChild.onclick=()=>{st.files.splice(i,1);st.analysis=null;renderCard(s);};fl.appendChild(d);});
+ card.querySelector('.reset').style.display=st.files.length?'':'none';
+ // العطلة
+ const h=card.querySelector('.hol');
+ if(!groups||!Object.keys(groups.sets).length){h.innerHTML='<b>عطلة لمجموعات:</b> <span class="muted">ارفع ملف المجاميع (بالأعلى) لتفعيل الخيار.</span>';}
+ else{
+  const names=Object.keys(groups.sets);if(!st.hol.set||!groups.sets[st.hol.set])st.hol.set=names[0];
+  h.innerHTML='<b>عطلة لمجموعات بهذي المحاضرة (اختياري):</b>';
+  if(names.length>1){const sel=document.createElement('select');sel.style.margin='6px 0';names.forEach(n=>{const o=document.createElement('option');o.value=n;o.textContent=n;sel.appendChild(o);});sel.value=st.hol.set;sel.onchange=()=>{st.hol.set=sel.value;st.hol.groups=new Set();st.analysis=null;renderCard(s);};h.appendChild(sel);}
+  const chips=document.createElement('div');chips.className='chips';
+  for(const g of groupNamesOf(groups.sets[st.hol.set])){const lab=document.createElement('label');lab.className='chip'+(st.hol.groups.has(g)?' on':'');lab.style.margin='0';lab.style.fontWeight='400';const cb=document.createElement('input');cb.type='checkbox';cb.checked=st.hol.groups.has(g);cb.onchange=()=>{cb.checked?st.hol.groups.add(g):st.hol.groups.delete(g);lab.classList.toggle('on',cb.checked);st.analysis=null;card.querySelector('.result').innerHTML='';};lab.appendChild(cb);lab.appendChild(document.createTextNode(g));chips.appendChild(lab);}
+  h.appendChild(chips);
+ }
+ renderResult(s);
+}
+async function runAnalysis(s){
+ const st=cardState.get(s.name),card=$('card-'+s.name),res=card.querySelector('.result');
+ if(!st.files.length){res.innerHTML='<div class="status warn">اختر ملف حضور واحد على الأقل لهذي المادة.</div>';return;}
+ res.innerHTML='<div class="status">جارٍ قراءة الملفات...</div>';
+ try{
+  const present=new Map(),fuzzy=[],unmatched=[],seen=new Set();let cells=0,ambiguous=[];
+  for(const f of st.files){
+   for(const t of await fileTexts(f)){
+    const key=normName(t);if(!key||seen.has(key))continue;seen.add(key);cells++;
+    const m=matchText(s.students,s.idx,t);
+    if(m&&m.i!==undefined){if(m.how==='fuzzy')fuzzy.push({text:t,i:m.i});if(!present.has(m.i))present.set(m.i,m.how);}
+    else if(m&&m.amb){ambiguous.push(t);}
+    else if(looksLikeName(key))unmatched.push({text:t,sugg:suggestions(s.students,t)});
+   }
+  }
+  st.analysis={present,fuzzy,unmatched,ambiguous,cells};
+  st.accepted=new Set();
+  for(const f of fuzzy)st.accepted.add(f.i);
+  st.picked=new Set();
+ }catch(e){res.innerHTML='';const d=document.createElement('div');d.className='status bad';d.textContent=e.message;res.appendChild(d);st.analysis=null;return;}
+ renderResult(s);
+}
+function holidayStudents(s,st){
+ const out=new Set();if(!groups||!st.hol.set||!st.hol.groups.size)return out;
+ const set=groups.sets[st.hol.set]||{};
+ s.students.forEach((x,i)=>{if(st.hol.groups.has(set[x.exam]))out.add(i);});return out;
+}
+function computePlan(s,st,lec){
+ const L=s.lec[lec],hol=holidayStudents(s,st),a=st.analysis;
+ const pres=new Set();
+ a.present.forEach((how,i)=>{if(how!=='fuzzy'||st.accepted.has(i))pres.add(i);});
+ st.picked.forEach(i=>pres.add(i));
+ const plan=[];const stats={one:0,zero:0,hol:0,exc:0};
+ s.students.forEach((x,i)=>{
+  const cur=valueOf(s,x.row,L);
+  let kind;
+  if(hol.has(i))kind='H';else if(cur==='م')kind='M';else if(pres.has(i))kind='1';else kind='0';
+  plan.push([x.row,kind]);
+  if(kind==='H')stats.hol++;else if(kind==='M')stats.exc++;else if(kind==='1')stats.one++;else stats.zero++;
+ });
+ return {plan,stats,pres};
+}
+function renderResult(s){
+ const st=cardState.get(s.name),card=$('card-'+s.name),res=card.querySelector('.result');
+ card.classList.toggle('done',!!st.doneLecture&&st.doneLecture===currentLecture());
+ if(!st.analysis){if(st.doneMsg){res.innerHTML='';const d=document.createElement('div');d.className='status good';d.textContent=st.doneMsg;res.appendChild(d);}return;}
+ const lec=currentLecture(),a=st.analysis,{stats}=computePlan(s,st,lec);
+ res.innerHTML='';
+ const sum=document.createElement('div');sum.className='status';
+ sum.textContent=`الأسماء المقروءة: ${a.cells}\nحاضرون مطابقون: ${a.present.size}${a.fuzzy.length?' (منهم '+a.fuzzy.length+' مطابقة تقريبية)':''}\nغير مطابقة: ${a.unmatched.length}${a.ambiguous.length?' | أسماء تطابق أكثر من طالب: '+a.ambiguous.length:''}\n— سيُكتب بالمحاضرة ${lec}:  1 ← ${stats.one} | 0 ← ${stats.zero} | عطلة ← ${stats.hol} | م (تبقى) ← ${stats.exc}`;
+ res.appendChild(sum);
+ if(a.fuzzy.length){
+  const det=document.createElement('details');det.innerHTML='<summary>مطابقات تقريبية ('+a.fuzzy.length+') — ألغِ اللي تشوفها غلط</summary>';
+  const t=document.createElement('table');t.innerHTML='<thead><tr><th></th><th>الاسم بالملف</th><th>طالب الملف الرئيسي</th></tr></thead>';
+  const tb=document.createElement('tbody');
+  for(const f of a.fuzzy){const tr=document.createElement('tr');const cb=document.createElement('input');cb.type='checkbox';cb.checked=st.accepted.has(f.i);cb.onchange=()=>{cb.checked?st.accepted.add(f.i):st.accepted.delete(f.i);renderResult(s);};const td=document.createElement('td');td.appendChild(cb);tr.appendChild(td);for(const x of [f.text,s.students[f.i].name]){const c=document.createElement('td');c.textContent=x;tr.appendChild(c);}tb.appendChild(tr);}
+  t.appendChild(tb);det.appendChild(t);res.appendChild(det);
+ }
+ if(a.unmatched.length){
+  const det=document.createElement('details');det.open=a.unmatched.length<=15;det.innerHTML='<summary>أسماء ما انطابقت ('+a.unmatched.length+') — اختر الطالب الصحيح أو اتركها</summary>';
+  for(const u of a.unmatched.slice(0,80)){
+   const d=document.createElement('div');d.className='sugg';d.style.padding='4px 0';d.style.borderBottom='1px dashed #e2e8f0';
+   const sp=document.createElement('span');sp.textContent=u.text+'  ';d.appendChild(sp);
+   if(!u.sugg.length){const m=document.createElement('span');m.className='muted';m.textContent='(لا يوجد اقتراح)';d.appendChild(m);}
+   for(const i of u.sugg){const b=document.createElement('button');b.className='secondary';const on=st.picked.has(i);b.textContent=(on?'✓ ':'')+s.students[i].name;b.onclick=()=>{on?st.picked.delete(i):st.picked.add(i);renderResult(s);};d.appendChild(b);}
+   det.appendChild(d);
+  }
+  res.appendChild(det);
+ }
+ const filled=lectureFilled(s,lec);
+ if(filled){const w=document.createElement('div');w.className='status warn';w.textContent=`تنبيه: المحاضرة ${lec} بهذي المادة فيها ${filled} قيمة مسجّلة، والكتابة تستبدلها (المجاز «م» يبقى).`;res.appendChild(w);}
+ const act=document.createElement('div');act.className='actions';
+ const ok=document.createElement('button');ok.className='ok';ok.textContent='تأكيد وكتابة بالمحاضرة '+lec;ok.onclick=()=>applyPlan(s);act.appendChild(ok);
+ if(master.undo&&master.undo.sheet===s.name){const u=document.createElement('button');u.className='secondary';u.textContent='تراجع عن آخر كتابة';u.onclick=()=>undoLast();act.appendChild(u);}
+ res.appendChild(act);
+}
+async function applyPlan(s){
+ const st=cardState.get(s.name),lec=currentLecture(),L=s.lec[lec];
+ if(!L||!st.analysis)return;
+ const filled=lectureFilled(s,lec);
+ if(filled&&!confirm(`المحاضرة ${lec} بمادة «${s.name}» فيها ${filled} قيمة. تستبدلها؟`))return;
+ const {plan,stats}=computePlan(s,st,lec);
+ const holStyle=stats.hol?await ensureHolidayStyle(master):null;
+ const hIdx=stats.hol?ssIndex(master,'عطلة'):null;
+ const old=[];
+ for(const [r,kind] of plan){
+  const c=getCell(s,r,L,false);
+  old.push({r,xml:c?new XMLSerializer().serializeToString(c):null});
+  if(kind==='M')continue;
+  if(kind==='H')setCell(s,r,L,'s',holStyle,hIdx);
+  else setCell(s,r,L,kind,baseStyle(s,r));
+ }
+ master.undo={sheet:s.name,lec,L,old};
+ refreshCaches(master);
+ try{await saveMaster();}catch(e){setStatus('masterInfo','تعذر حفظ الملف بالمتصفح: '+e.message,'bad');}
+ st.doneLecture=lec;st.doneMsg=`✓ تم تسجيل المحاضرة ${lec}: 1 ← ${stats.one} | 0 ← ${stats.zero} | عطلة ← ${stats.hol} | م ← ${stats.exc}. الملف انحفظ تلقائياً.`;
+ st.analysis=null;st.files=[];
+ logLine(`${s.name} — المحاضرة ${lec}: 1=${stats.one}, 0=${stats.zero}, عطلة=${stats.hol}`);
+ renderMaster();updateLectureNote();renderCard(s);
+}
+async function undoLast(){
+ const u=master.undo;if(!u)return;
+ const s=master.subs.find(x=>x.name===u.sheet);
+ for(const o of u.old){
+  const c=getCell(s,o.r,u.L,true);
+  if(o.xml===null){while(c.firstChild)c.removeChild(c.firstChild);c.removeAttribute('t');continue;}
+  const n=new DOMParser().parseFromString(o.xml,'application/xml').documentElement;
+  const imp=s.doc.importNode(n,true);c.parentNode.replaceChild(imp,c);
+ }
+ master.undo=null;refreshCaches(master);await saveMaster();
+ const st=cardState.get(s.name);st.doneLecture=null;st.doneMsg='تم التراجع عن آخر كتابة.';
+ logLine(`تراجع: ${s.name} — المحاضرة ${u.lec}`);renderMaster();updateLectureNote();renderCard(s);
+}
+function renderMaster(){
+ if(!master){setStatus('masterInfo','لا يوجد ملف محفوظ. اختر الملف مرة وحدة.');$('dlBtn').disabled=true;return;}
+ const lastFilled=master.subs.map(s=>{let m=0;for(const n of Object.keys(s.lec)){if(lectureFilled(s,+n))m=Math.max(m,+n);}return s.name+': آخر محاضرة مسجّلة '+(m||'—');});
+ setStatus('masterInfo','محفوظ ✓ — '+master.name+'\n'+master.subs.length+' مواد، '+master.subs[0].students.length+' طالب\n'+lastFilled.join('\n')+'\nيتحدث تلقائياً بعد كل تسجيل.','good');
+ $('dlBtn').disabled=false;
+}
+async function download(){
+ const buf=await serializeMaster(master);
+ const blob=new Blob([buf],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+ const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(master.name.replace(/\.xlsx$/i,'')||'attendance')+'_محدث.xlsx';
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),4000);
+}
+async function activateMaster(buf,name,persist){
+ master=await loadMasterBuffer(buf,name);
+ cardState.clear();
+ renderMaster();renderLectureOptions();renderCards();renderGroupsInfo();
+ if(persist){await idbSet('master',{name,buf,savedAt:Date.now()});}
+}
+/* ---------------- الأحداث ---------------- */
+$('masterFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ try{
+  if(master&&!confirm('يوجد ملف محفوظ. استبداله بهذا الملف؟ (نزّل نسخة من المحدّث قبل إذا تحتاجها)')){e.target.value='';return;}
+  await activateMaster(await f.arrayBuffer(),f.name,true);logLine('تم تثبيت الملف: '+f.name);
+ }catch(err){setStatus('masterInfo',err.message,'bad');}
+ e.target.value='';
+});
+$('groupsFile').addEventListener('change',async e=>{
+ const f=e.target.files[0];if(!f)return;
+ if(!master){setStatus('groupsInfo','ثبّت ملف الحضور أولاً (للمطابقة مع الأسماء).','warn');e.target.value='';return;}
+ try{
+  const sets=await parseGroups(await f.arrayBuffer(),groupsMatcher());
+  if(!Object.keys(sets).length)throw new Error('ما قدرت أقرأ المجاميع. لازم ورقة لكل مجموعة (اسم الورقة = اسم المجموعة) أو عمود عنوانه «المجموعة»، مع اسم الطالب أو رقمه الامتحاني.');
+  groups={name:f.name,savedAt:Date.now(),sets};await idbSet('groups',groups);renderGroupsInfo();for(const s of master.subs)renderCard(s);logLine('تم تثبيت ملف المجاميع: '+f.name);
+ }catch(err){setStatus('groupsInfo',err.message,'bad');}
+ e.target.value='';
+});
+$('groupsClear').addEventListener('click',async()=>{if(!confirm('حذف المجاميع المحفوظة؟'))return;groups=null;await idbDel('groups');renderGroupsInfo();if(master)for(const s of master.subs)renderCard(s);});
+$('dlBtn').addEventListener('click',download);
+$('lecture').addEventListener('change',()=>{updateLectureNote();if(master)for(const s of master.subs){const st=cardState.get(s.name);if(st){st.doneMsg=null;st.doneLecture=null;renderCard(s);}}});
+window.addEventListener('beforeunload',()=>{});
+/* ---------------- البداية ---------------- */
+(async()=>{
+ if(!window.JSZip){setStatus('masterInfo','مكتبة القراءة ما تحمّلت. افتح الصفحة وانت متصل بالإنترنت أول مرة.','bad');return;}
+ try{
+  groups=(await idbGet('groups'))||null;
+  const saved=await idbGet('master');
+  if(saved&&saved.buf){await activateMaster(saved.buf,saved.name,false);logLine('تم استرجاع الملف المحفوظ: '+saved.name);}
+ }catch(e){setStatus('masterInfo','تعذر استرجاع الملف المحفوظ: '+e.message,'bad');}
+ if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+})();
+})();
+</script>
+</body></html>
